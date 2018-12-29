@@ -1,68 +1,74 @@
 import * as esprima from 'esprima';
-import {Circle, Rhombus, Square} from './cfg-objects';
+import {Node} from './cfg-objects';
 
-let objectsArray;
-let tempCircle = null;
+let endLoopNode;
+let idCounter;
 
 const cfgParser = (code) => {
-    objectsArray = []; //new
     let parsedScript = esprima.parseScript(code);
+    //new
+    endLoopNode = null;
+    idCounter = 0;
     //root
-    let root = new Square();
-    addToObjectsArray(root);
+    let root = new Node(idCounter++, 'root');
     recursiveParser(parsedScript, root);
-    return objectsArray;
+    return root;
 };
 
-function recursiveParser(code, prevObject){
+function recursiveParser(code, lastNode){
     //stop condition
     if (code == null || code.type == null) return;
-    typeParser1(code, prevObject);
+    if (endLoopNode != null) {
+        let newLastNode = endLoopNode;
+        endLoopNode = null;
+        typeParser1(code, newLastNode);
+    } else
+        typeParser1(code, lastNode);
 }
 
-function typeParser1(code, prevObject){
-    if (code.type === 'Program') return typeProgramParser(code, prevObject);
-    else if (code.type === 'FunctionDeclaration') return typeFunctionDeclarationParser(code, prevObject);
-    else if (code.type === 'BlockStatement') return typeBlockStatementParser(code, prevObject);
-    else if (code.type === 'VariableDeclaration') return typeVariableDeclarationParser(code, prevObject);
-    else return typeParser2(code, prevObject);
+function typeParser1(code, lastNode){
+    if (code.type === 'Program') return typeProgramParser(code, lastNode);
+    else if (code.type === 'FunctionDeclaration') return typeFunctionDeclarationParser(code, lastNode);
+    else if (code.type === 'BlockStatement') return typeBlockStatementParser(code, lastNode);
+    else if (code.type === 'VariableDeclaration') return typeVariableDeclarationParser(code, lastNode);
+    else return typeParser2(code, lastNode);
 }
 
-function typeParser2(code, prevObject){
-    if (code.type === 'ExpressionStatement') return typeExpressionStatementParser(code, prevObject);
-    else if (code.type === 'AssignmentExpression') return typeAssignmentExpressionParser(code, prevObject);
+function typeParser2(code, lastNode){
+    if (code.type === 'ExpressionStatement') return typeExpressionStatementParser(code, lastNode);
+    else if (code.type === 'AssignmentExpression') return typeAssignmentExpressionParser(code, lastNode);
     else if (code.type === 'EmptyStatement') return;
-    else return typeParser3(code, prevObject);
+    else return typeParser3(code, lastNode);
 }
 
-function typeParser3(code, prevObject){
-    if (code.type === 'WhileStatement') return typeWhileStatementParser(code, prevObject);
-    else if (code.type === 'IfStatement') return typeIfStatementParser(code, prevObject);
-    return typeReturnStatementParser(code, prevObject);
+function typeParser3(code, lastNode){
+    if (code.type === 'WhileStatement') return typeWhileStatementParser(code, lastNode);
+    else if (code.type === 'IfStatement') return typeIfStatementParser(code, lastNode);
+    return typeReturnStatementParser(code, lastNode);
 }
 
-function typeReturnValues(code, prevObject){
-    if (code.type === 'MemberExpression') return typeMemberExpressionParser(code, prevObject);
-    else if (code.type === 'BinaryExpression') return typeBinaryExpressionParser(code, prevObject);
-    else if (code.type === 'UnaryExpression') return typeUnaryExpressionParser(code, prevObject);
-    else if (code.type === 'Literal') return typeLiteralParser(code, prevObject);
-    return typeIdentifierParser(code, prevObject);
+function typeReturnValues(code){
+    if (code.type === 'MemberExpression') return typeMemberExpressionParser(code);
+    else if (code.type === 'BinaryExpression') return typeBinaryExpressionParser(code);
+    else if (code.type === 'UnaryExpression') return typeUnaryExpressionParser(code);
+    else if (code.type === 'Literal') return typeLiteralParser(code);
+    return typeIdentifierParser(code);
 }
 
-function typeProgramParser(code, prevObject){
+function typeProgramParser(code, lastNode){
     //ignore parse and continue
     code.body.forEach(function (x) {
-        recursiveParser(x, prevObject);
+        recursiveParser(x, lastNode);
     });
 }
 
-function typeFunctionDeclarationParser(code, prevObject){
+function typeFunctionDeclarationParser(code, lastNode){
     //add function itself
     // addToResult(lineNumber, code.type, typeReturnValues(code.id), null, null);
     //add params
     // functionParamsParser(code.params);
     //body
-    recursiveParser(code.body, prevObject);
+    recursiveParser(code.body, lastNode);
 }
 
 // function functionParamsParser(code){
@@ -71,144 +77,126 @@ function typeFunctionDeclarationParser(code, prevObject){
 //     });
 // }
 
-function typeBlockStatementParser(code, prevObject){
-    //circle
-    if (tempCircle != null){
-        prevObject = tempCircle;
-        tempCircle = null;
-    }
-
-    //create new square
-    let square = new Square();
-    addToObjectsArray(square);
-    square.prev = prevObject;
-
-    if (prevObject.type === 'while' || prevObject.type === 'if') {
-        prevObject.nextTrue = square;
-        square.next = prevObject.finalObject;
-        prevObject.finalObject.prevArray.push(square);
-    } else {
-        prevObject.next = square;
-    }
-
+function typeBlockStatementParser(code, lastNode){
     //ignore parse and continue
     code.body.forEach(function (x) {
-        recursiveParser(x, square);
+        recursiveParser(x, lastNode);
     });
 }
 
-function typeVariableDeclarationParser(code, prevObject){
+function typeVariableDeclarationParser(code, lastNode){
     code.declarations.forEach(function (x) {
-        typeVariableDeclaratorParser(x, prevObject);
+        typeVariableDeclaratorParser(x, lastNode);
     });
 }
 
-function typeVariableDeclaratorParser(code, prevObject){
+function typeVariableDeclaratorParser(code, lastNode){
     //check if init
     if (code.init != null)
-        prevObject.assignmentsArray.push(typeReturnValues(code.id, prevObject) + ' = ' + typeReturnValues(code.init, prevObject));
+        lastNode.assignmentsArray.push(typeReturnValues(code.id) + ' = ' + typeReturnValues(code.init));
     else
-        prevObject.assignmentsArray.push(typeReturnValues(code.id, prevObject));
+        lastNode.assignmentsArray.push(typeReturnValues(code.id));
 }
 
-function typeExpressionStatementParser(code, prevObject){
+function typeExpressionStatementParser(code, lastNode){
     //ignore and continue
-    recursiveParser(code.expression, prevObject);
+    recursiveParser(code.expression, lastNode);
 }
 
-function typeAssignmentExpressionParser(code, prevObject){
-    prevObject.assignmentsArray.push(typeReturnValues(code.left, prevObject) + ' = ' + typeReturnValues(code.right, prevObject));
+function typeAssignmentExpressionParser(code, lastNode){
+    lastNode.assignmentsArray.push(typeReturnValues(code.left) + ' = ' + typeReturnValues(code.right));
 }
 
-function typeBinaryExpressionParser(code, prevObject){
+function typeBinaryExpressionParser(code){
     //return value
-    return typeReturnValues(code.left, prevObject) + ' ' + code.operator + ' ' + typeReturnValues(code.right, prevObject);
+    return typeReturnValues(code.left) + ' ' + code.operator + ' ' + typeReturnValues(code.right);
 }
 
-function typeWhileStatementParser(code, prevObject){
-    //new null square
-    let nullSquare = new Square();
-    addToObjectsArray(nullSquare);
-    nullSquare.assignmentsArray.push('NULL');
-    nullSquare.prev = prevObject;
+function typeWhileStatementParser(code, lastNode){
+    //new null
+    let whileNullNode = new Node(idCounter++, 'while_null');
+    lastNode.nextTrue = whileNullNode;
 
-    //new rhombus
-    let rhombus = new Rhombus('while');
-    addToObjectsArray(rhombus);
-    rhombus.prev = nullSquare;
-    rhombus.finalObject = nullSquare;
+    //new while
+    let whileNode = new Node(idCounter++, 'while');
+    whileNullNode.nextTrue = whileNode;
+    whileNode.finalNode = whileNullNode;
+
+    //new next true
+    let nextWhileTrue = new Node(idCounter++, 'while_true');
+    whileNode.nextTrue = nextWhileTrue;
+
+    //new next false
+    let nextWhileFalse = new Node(idCounter++, 'while_false');
+    whileNode.nextFalse = nextWhileFalse;
 
     //while itself
-    rhombus.test = typeReturnValues(code.test, prevObject);
-    if (safeEvalFunc(rhombus.test))
-        rhombus.testEval = true;
+    whileNode.test = recursiveParser(code.test);
 
     //body
-    recursiveParser(code.body, rhombus);
+    recursiveParser(code.body, nextWhileTrue);
+
+    //end while
+    endLoopNode = nextWhileFalse;
 }
 
-function typeIfStatementParser(code, prevObject){
-    //new rhombus
-    let rhombus = new Rhombus('if');
-    addToObjectsArray(rhombus);
-    rhombus.prev = prevObject;
+function typeIfStatementParser(code, lastNode){
+    //new if
+    let ifNode = new Node(idCounter++, 'if');
+    lastNode.nextTrue = ifNode;
 
-    if (prevObject.type === 'if'){
-        prevObject.nextFalse = rhombus;
-        rhombus.finalObject = prevObject.finalObject;
-    } else {
-        prevObject.next = rhombus;
-        let circle = new Circle();
-        addToObjectsArray(circle);
-        rhombus.finalObject = circle;
-    }
+    //new next true
+    let nextTrueNode = new Node(idCounter++, 'if_true');
+    ifNode.nextTrue = nextTrueNode;
+
+    //new next false
+    let nextFalseNode = new Node(idCounter++, 'if_false');
+    ifNode.nextFalse = nextFalseNode;
+
+    //new final
+    if (lastNode.finalNode == null)
+        ifNode.finalNode = new Node(idCounter++, 'if_final');
+    else
+        ifNode.finalNode = lastNode.finalNode;
+
+    //set finals
+    nextTrueNode.finalNode = ifNode.finalNode;
+    nextFalseNode.finalNode = ifNode.finalNode;
 
     //if itself
-    rhombus.test = typeReturnValues(code.test, prevObject);
+    ifNode.test = typeReturnValues(code.test);
 
     //consequent
-    recursiveParser(code.consequent, rhombus);
+    recursiveParser(code.consequent, nextTrueNode);
 
     //alternate
     if (code.alternate != null)
-        recursiveParser(code.alternate, rhombus);
+        recursiveParser(code.alternate, nextFalseNode);
 
-    tempCircle = rhombus.finalObject;
+    //end if
+    endLoopNode = ifNode.finalNode;
 }
 
-function typeReturnStatementParser(code, prevObject){
-    //new square
-    let square = new Square();
-    addToObjectsArray(square);
-    // if (prevObject.type === 'if') {
-    //     square.prev = prevObject.finalObject;
-    //     prevObject.finalObject.next = square;
-    // } else
-    //     square.prev = prevObject;
-
-    if (tempCircle != null) {
-        for (let i = 0; i < objectsArray.length; i++)
-            if (objectsArray[i] === tempCircle) {
-                square.prev = objectsArray[i];
-                objectsArray[i].next = square;
-            }
-    }
+function typeReturnStatementParser(code, lastNode){
+    //new return node
+    let returnNode = new Node(idCounter++, 'return');
+    lastNode.nextTrue = returnNode;
 
     //empty
     if (code.argument == null)
-        square.assignmentsArray.push('return');
+        returnNode.assignmentsArray.push('return');
     else
-        square.assignmentsArray.push('return ' + typeReturnValues(code.argument, prevObject));
+        returnNode.assignmentsArray.push('return ' + typeReturnValues(code.argument));
 }
 
-function typeMemberExpressionParser(code, prevObject){
+function typeMemberExpressionParser(code){
     //return value
-    return typeReturnValues(code.object, prevObject) + '[' + typeReturnValues(code.property, prevObject) + ']';
+    return typeReturnValues(code.object) + '[' + typeReturnValues(code.property) + ']';
 }
 
-function typeUnaryExpressionParser(code, prevObject){
+function typeUnaryExpressionParser(code){
     //return value
-    return code.operator + typeReturnValues(code.argument, prevObject);
+    return code.operator + typeReturnValues(code.argument);
 }
 
 function typeLiteralParser(code){
@@ -219,10 +207,6 @@ function typeLiteralParser(code){
 function typeIdentifierParser(code){
     //return value
     return code.name;
-}
-
-function addToObjectsArray(object){
-    objectsArray.push(object);
 }
 
 function safeEvalFunc(code){
