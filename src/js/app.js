@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import {parseCode} from './code-analyzer';
 import {recursionParser} from './my-parser';
+import {cfgParser} from './cfg-parser';
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
@@ -13,6 +14,8 @@ $(document).ready(function () {
         let result = recursionParser(codeToParse);
         buildTable();
         printToTable(result);
+
+        console.log(cfgParser(codeToParse));
     });
 });
 
