@@ -132,21 +132,31 @@ function typeWhileStatementParser(code, lastNode){
     //new null
     let whileNullNode = new Node(idCounter++, 'while_null');
     lastNode.nextTrue = whileNullNode;
+    whileNullNode.prevNode = lastNode;
     whileNullNode.assignmentsArray.push('NULL');
 
     //new while
     let whileNode = new Node(idCounter++, 'while');
     whileNullNode.nextTrue = whileNode;
-    whileNode.finalNode = whileNullNode;
+    whileNode.prevNode = whileNullNode;
+    // whileNode.finalNode = whileNullNode;
 
     //new next true
     let nextWhileTrue = new Node(idCounter++, 'while_true');
     whileNode.nextTrue = nextWhileTrue;
-    nextWhileTrue.finalNode = whileNullNode;
+    nextWhileTrue.prevNode = whileNode;
+    nextWhileTrue.nextTrue = whileNullNode;
+    // nextWhileTrue.finalNode = whileNullNode;
 
     //new next false
     let nextWhileFalse = new Node(idCounter++, 'while_false');
     whileNode.nextFalse = nextWhileFalse;
+    nextWhileFalse.prevNode = whileNode;
+
+    //finals
+    whileNullNode.finalNode = nextWhileFalse;
+    whileNode.finalNode = nextWhileFalse;
+    nextWhileTrue.finalNode = nextWhileFalse;
 
     //closing while
     if (lastNode.type !== 'while')
