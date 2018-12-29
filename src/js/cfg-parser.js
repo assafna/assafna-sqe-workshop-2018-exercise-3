@@ -143,6 +143,10 @@ function typeWhileStatementParser(code, lastNode){
     let nextWhileFalse = new Node(idCounter++, 'while_false');
     whileNode.nextFalse = nextWhileFalse;
 
+    //closing while
+    if (lastNode.type !== 'while')
+        lastNode.afterLoopNode = nextWhileFalse;
+
     //while itself
     whileNode.test = typeReturnValues(code.test);
 
