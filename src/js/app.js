@@ -1,7 +1,12 @@
 import $ from 'jquery';
+import mermaid from 'mermaid';
 import {parseCode} from './code-analyzer';
 import {recursionParser} from './my-parser';
 import {cfgParser} from './cfg-parser';
+
+let cfgArray;
+let cfgResult;
+let id;
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
@@ -15,7 +20,19 @@ $(document).ready(function () {
         buildTable();
         printToTable(result);
 
-        console.log(cfgParser(codeToParse));
+        let root = cfgParser(codeToParse);
+        console.log(root);
+
+        cfgArray = [];
+        cfgResult = 'graph TD\n';
+        id = 0;
+
+        removeIrrelevantNodes(root);
+        graphToCFGRecursive(root);
+        cfgArrayToString();
+        console.log(root);
+        console.log(cfgResult);
+        printCFG();
     });
 });
 
@@ -72,4 +89,55 @@ function printToTable(result){
         conditionCell.innerHTML = x.condition;
         valueCell.innerHTML = x.value;
     });
+}
+
+function removeIrrelevantNodes(node){
+    if (node.nextTrue != null)
+        if (node.nextTrue.assignmentsArray.length === 0 && node.nextTrue.test == null && node.nextTrue.type !== 'if_final') {
+            node.nextTrue.type = node.type;
+            node.nextTrue.type = 'if2_true';
+        }
+    if (node.nextFalse != null)
+        if (node.nextFalse.assignmentsArray.length === 0 && node.nextFalse.test == null && node.nextFalse.type !== 'if_final') {
+            node.nextFalse = node.nextFalse.nextTrue;
+            node.nextFalse.type = 'if2_false';
+        }
+    if (node.nextTrue != null) removeIrrelevantNodes(node.nextTrue);
+    if (node.nextFalse != null) removeIrrelevantNodes(node.nextFalse);
+}
+
+function printCFG(){
+    let div = document.getElementById('cfg');
+    div.innerHTML = cfgResult.toString();
+    mermaid.init({noteMargin: 10}, '#cfg');
+}
+
+function graphToCFGRecursive(node) {
+    if (id === 0) {
+        addToCFGArray(node.toString() + '\n');
+        addToCFGArray(node.id + ' --> ' + node.nextTrue.toString() + '\n');
+        id++;
+    } if (node.nextTrue != null) {
+        addToCFGArray(node.id + ' --> ' + node.nextTrue.toString() + '\n');
+        id++;
+        graphToCFGRecursive(node.nextTrue);
+    } if (node.nextFalse != null) {
+        addToCFGArray(node.id + ' --> ' + node.nextFalse.toString() + '\n');
+        id++;
+        graphToCFGRecursive(node.nextFalse);
+    } if (node.type !== 'if' && !node.type.includes('if2_') && node.finalNode != null) {
+        addToCFGArray(node.id + ' --> ' + node.finalNode.toString() + '\n');
+        id++;
+        graphToCFGRecursive(node.finalNode);
+    }
+}
+
+function addToCFGArray(text) {
+    if (!cfgArray.includes(text))
+        cfgArray.push(text);
+}
+
+function cfgArrayToString() {
+    for (let i = 0; i < cfgArray.length; i++)
+        cfgResult += cfgArray[i];
 }
