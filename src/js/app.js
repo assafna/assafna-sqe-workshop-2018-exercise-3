@@ -27,7 +27,8 @@ $(document).ready(function () {
         cfgResult = 'graph TD\n';
         id = 0;
 
-        removeIrrelevantNodes(root);
+        // removeIrrelevantNodes(root);
+        console.log(root);
         graphToCFGRecursive(root);
         cfgArrayToString();
         console.log(root);
@@ -94,13 +95,21 @@ function printToTable(result){
 function removeIrrelevantNodes(node){
     if (node.nextTrue != null)
         if (node.nextTrue.assignmentsArray.length === 0 && node.nextTrue.test == null && node.nextTrue.type !== 'if_final') {
-            node.nextTrue.type = node.type;
-            node.nextTrue.type = 'if2_true';
+            node.nextTrue = node.nextTrue.nextTrue;
+            if (node.nextTrue != null)
+                if (node.nextTrue.type !== 'return')
+                    node.nextTrue.type = 'if2_true';
+                else
+                    node.nextTrue.type = 'return_true';
         }
     if (node.nextFalse != null)
         if (node.nextFalse.assignmentsArray.length === 0 && node.nextFalse.test == null && node.nextFalse.type !== 'if_final') {
             node.nextFalse = node.nextFalse.nextTrue;
-            node.nextFalse.type = 'if2_false';
+            if (node.nextFalse != null)
+                if (node.nextFalse.type !== 'return')
+                    node.nextFalse.type = 'if2_false';
+                else
+                    node.nextFalse.type = 'return_false';
         }
     if (node.nextTrue != null) removeIrrelevantNodes(node.nextTrue);
     if (node.nextFalse != null) removeIrrelevantNodes(node.nextFalse);
@@ -125,10 +134,11 @@ function graphToCFGRecursive(node) {
         addToCFGArray(node.id + ' --> ' + node.nextFalse.toString() + '\n');
         id++;
         graphToCFGRecursive(node.nextFalse);
-    } if (node.type !== 'if' && !node.type.includes('if2_') && node.finalNode != null) {
+    } if (node.type !== 'if' && node.type !== 'while' && !node.type.includes('if2_') && node.finalNode != null) {
         addToCFGArray(node.id + ' --> ' + node.finalNode.toString() + '\n');
         id++;
-        graphToCFGRecursive(node.finalNode);
+        if (node.type !== 'while_true')
+            graphToCFGRecursive(node.finalNode);
     }
 }
 

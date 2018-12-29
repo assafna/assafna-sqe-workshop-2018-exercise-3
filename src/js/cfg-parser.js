@@ -1,13 +1,11 @@
 import * as esprima from 'esprima';
 import {Node} from './cfg-objects';
 
-let endLoopNode;
 let idCounter;
 
 const cfgParser = (code) => {
     let parsedScript = esprima.parseScript(code);
     //new
-    endLoopNode = null;
     idCounter = 0;
     //root
     let root = new Node(idCounter++, 'root');
@@ -18,12 +16,7 @@ const cfgParser = (code) => {
 function recursiveParser(code, lastNode){
     //stop condition
     if (code == null || code.type == null) return;
-    if (endLoopNode != null) {
-        let newLastNode = endLoopNode;
-        endLoopNode = null;
-        typeParser1(code, newLastNode);
-    } else
-        typeParser1(code, lastNode);
+    typeParser1(code, lastNode);
 }
 
 function typeParser1(code, lastNode){
@@ -37,6 +30,7 @@ function typeParser1(code, lastNode){
 function typeParser2(code, lastNode){
     if (code.type === 'ExpressionStatement') return typeExpressionStatementParser(code, lastNode);
     else if (code.type === 'AssignmentExpression') return typeAssignmentExpressionParser(code, lastNode);
+    else if (code.type === 'UpdateExpression') return typeUpdateExpressionParser(code, lastNode);
     else if (code.type === 'EmptyStatement') return;
     else return typeParser3(code, lastNode);
 }
@@ -50,7 +44,12 @@ function typeParser3(code, lastNode){
 function typeReturnValues(code){
     if (code.type === 'MemberExpression') return typeMemberExpressionParser(code);
     else if (code.type === 'BinaryExpression') return typeBinaryExpressionParser(code);
-    else if (code.type === 'UnaryExpression') return typeUnaryExpressionParser(code);
+    else if (code.type === 'LogicalExpression') return typeLogicalExpressionParser(code);
+    else return typeReturnValues2(code);
+}
+
+function typeReturnValues2(code){
+    if (code.type === 'UnaryExpression') return typeUnaryExpressionParser(code);
     else if (code.type === 'Literal') return typeLiteralParser(code);
     return typeIdentifierParser(code);
 }
@@ -80,7 +79,10 @@ function typeFunctionDeclarationParser(code, lastNode){
 function typeBlockStatementParser(code, lastNode){
     //ignore parse and continue
     code.body.forEach(function (x) {
-        recursiveParser(x, lastNode);
+        if (lastNode.afterLoopNode != null)
+            recursiveParser(x, lastNode.afterLoopNode);
+        else
+            recursiveParser(x, lastNode);
     });
 }
 
@@ -107,7 +109,16 @@ function typeAssignmentExpressionParser(code, lastNode){
     lastNode.assignmentsArray.push(typeReturnValues(code.left) + ' = ' + typeReturnValues(code.right));
 }
 
+function typeUpdateExpressionParser(code, lastNode) {
+    lastNode.assignmentsArray.push(typeReturnValues(code.argument) + code.operator);
+}
+
 function typeBinaryExpressionParser(code){
+    //return value
+    return typeReturnValues(code.left) + ' ' + code.operator + ' ' + typeReturnValues(code.right);
+}
+
+function typeLogicalExpressionParser(code) {
     //return value
     return typeReturnValues(code.left) + ' ' + code.operator + ' ' + typeReturnValues(code.right);
 }
@@ -116,6 +127,7 @@ function typeWhileStatementParser(code, lastNode){
     //new null
     let whileNullNode = new Node(idCounter++, 'while_null');
     lastNode.nextTrue = whileNullNode;
+    whileNullNode.assignmentsArray.push('NULL');
 
     //new while
     let whileNode = new Node(idCounter++, 'while');
@@ -125,19 +137,17 @@ function typeWhileStatementParser(code, lastNode){
     //new next true
     let nextWhileTrue = new Node(idCounter++, 'while_true');
     whileNode.nextTrue = nextWhileTrue;
+    nextWhileTrue.finalNode = whileNullNode;
 
     //new next false
     let nextWhileFalse = new Node(idCounter++, 'while_false');
     whileNode.nextFalse = nextWhileFalse;
 
     //while itself
-    whileNode.test = recursiveParser(code.test);
+    whileNode.test = typeReturnValues(code.test);
 
     //body
     recursiveParser(code.body, nextWhileTrue);
-
-    //end while
-    endLoopNode = nextWhileFalse;
 }
 
 function typeIfStatementParser(code, lastNode){
@@ -154,10 +164,13 @@ function typeIfStatementParser(code, lastNode){
     ifNode.nextFalse = nextFalseNode;
 
     //new final
-    if (lastNode.finalNode == null)
-        ifNode.finalNode = new Node(idCounter++, 'if_final');
-    else
-        ifNode.finalNode = lastNode.finalNode;
+    ifNode.finalNode = new Node(idCounter++, 'if_final');
+    if (lastNode.finalNode != null)
+        ifNode.finalNode.nextTrue = lastNode.finalNode;
+
+    //closing if
+    if (lastNode.type !== 'if')
+        lastNode.afterLoopNode = ifNode.finalNode;
 
     //set finals
     nextTrueNode.finalNode = ifNode.finalNode;
@@ -172,9 +185,6 @@ function typeIfStatementParser(code, lastNode){
     //alternate
     if (code.alternate != null)
         recursiveParser(code.alternate, nextFalseNode);
-
-    //end if
-    endLoopNode = ifNode.finalNode;
 }
 
 function typeReturnStatementParser(code, lastNode){
