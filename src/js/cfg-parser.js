@@ -81,7 +81,9 @@ function typeBlockStatementParser(code, lastNode){
     code.body.forEach(function (x) {
         if (lastNode.afterLoopNode != null) {
             let newNode = new Node(idCounter++, 'node');
+            if (lastNode.prevNode != null) newNode.finalNode = lastNode.prevNode.finalNode;
             lastNode.afterLoopNode.nextTrue = newNode;
+            newNode.prevNode = lastNode.afterLoopNode;
             recursiveParser(x, newNode);
         }
         else
@@ -161,17 +163,21 @@ function typeIfStatementParser(code, lastNode){
     //new if
     let ifNode = new Node(idCounter++, 'if');
     lastNode.nextTrue = ifNode;
+    ifNode.prevNode = lastNode;
 
     //new next true
     let nextTrueNode = new Node(idCounter++, 'if_true');
     ifNode.nextTrue = nextTrueNode;
+    nextTrueNode.prevNode = ifNode;
 
     //new next false
     let nextFalseNode = new Node(idCounter++, 'if_false');
     ifNode.nextFalse = nextFalseNode;
+    nextFalseNode.prevNode = ifNode;
 
     //new final
     ifNode.finalNode = new Node(idCounter++, 'if_final');
+    ifNode.finalNode.prevNode = ifNode;
     if (lastNode.finalNode != null)
         ifNode.finalNode.nextTrue = lastNode.finalNode;
 
@@ -198,6 +204,7 @@ function typeReturnStatementParser(code, lastNode){
     //new return node
     let returnNode = new Node(idCounter++, 'return');
     lastNode.nextTrue = returnNode;
+    returnNode.prevNode = lastNode;
 
     //empty
     if (code.argument == null)

@@ -48,8 +48,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/js/cfg-parser.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="238">
-                  <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
+                <state relative-caret-position="541">
+                  <caret line="86" column="40" lean-forward="true" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
                   <folding>
                     <element signature="e#0#35#0" expanded="true" />
                   </folding>
@@ -84,8 +84,8 @@
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/src/js/cfg-objects.js">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="136">
-                      <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+                    <state relative-caret-position="153">
+                      <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
                     </state>
                   </provider>
                 </entry>
@@ -125,6 +125,7 @@
       <find>++idCounter</find>
       <find>nextTrue</find>
       <find>node</find>
+      <find>new node</find>
     </findStrings>
     <replaceStrings>
       <replace>lastNode</replace>
@@ -143,8 +144,8 @@
         <option value="$PROJECT_DIR$/src/js/my-parser.js" />
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/src/js/app.js" />
-        <option value="$PROJECT_DIR$/src/js/cfg-parser.js" />
         <option value="$PROJECT_DIR$/src/js/cfg-objects.js" />
+        <option value="$PROJECT_DIR$/src/js/cfg-parser.js" />
       </list>
     </option>
   </component>
@@ -227,12 +228,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1545999846059</updated>
-      <workItem from="1545999849064" duration="42299000" />
+      <workItem from="1545999849064" duration="43259000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="42299000" />
+    <option name="totallyTimeSpent" value="43259000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -319,15 +320,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/js/cfg-objects.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+        <state relative-caret-position="153">
+          <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/js/cfg-parser.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
+        <state relative-caret-position="541">
+          <caret line="86" column="40" lean-forward="true" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>

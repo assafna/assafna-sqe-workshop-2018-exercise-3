@@ -7,6 +7,7 @@ function Node (id, type) {
     this.nextFalse = null;
     this.finalNode = null;
     this.afterLoopNode = null;
+    this.prevNode = null;
 
     this.toString = function () {
         return nodeTexter(this, nodeStyler(this, nodeCoder(this)));
