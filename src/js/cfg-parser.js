@@ -79,8 +79,11 @@ function typeFunctionDeclarationParser(code, lastNode){
 function typeBlockStatementParser(code, lastNode){
     //ignore parse and continue
     code.body.forEach(function (x) {
-        if (lastNode.afterLoopNode != null)
-            recursiveParser(x, lastNode.afterLoopNode);
+        if (lastNode.afterLoopNode != null) {
+            let newNode = new Node(idCounter++, 'node');
+            lastNode.afterLoopNode.nextTrue = newNode;
+            recursiveParser(x, newNode);
+        }
         else
             recursiveParser(x, lastNode);
     });
