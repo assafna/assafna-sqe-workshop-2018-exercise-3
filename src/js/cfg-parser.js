@@ -264,7 +264,7 @@ function typeReturnStatementParser(code, lastNode, endNode, dictionary, amITrue)
     let returnNode = new Node(idCounter++, 'return', 'square');
     lastNode.nextTrue = returnNode;
     returnNode.prevNode = lastNode;
-    returnNode.nextTrue = endNode;
+    // returnNode.nextTrue = endNode;
     if (amITrue) returnNode.isFlow = true;
 
     //empty
