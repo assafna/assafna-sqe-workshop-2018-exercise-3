@@ -17,18 +17,6 @@
             width: 80%;
             height: 95%;
         }
-
-        #resultTable {
-            border-collapse: collapse;
-        }
-
-        #resultTable, #resultTable th, #resultTable td {
-            border: 1px solid black;
-        }
-
-        #resultTable td {
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -44,7 +32,7 @@
         </td>
         <td>
             <div>
-                <label>Parsed code here</label>
+                <label>CFG here</label>
             </div>
         </td>
     </tr>
@@ -55,8 +43,8 @@
             </div>
         </td>
         <td>
-            <div class="textAreaWrapper">
-                <textarea id="parsedCode" title="Parse code"></textarea>
+            <!--CFG Graph-->
+            <div id="cfg">
             </div>
         </td>
     </tr>
@@ -70,14 +58,6 @@
         </td>
     </tr>
 </table>
-
-<!--Result Table-->
-<div id = "result">
-</div>
-
-<!--CFG Graph-->
-<div id="cfg">
-</div>
 
 <script src="dist/bundle.js"></script>
 <script src="node_modules/mermaid/dist/mermaid.min.js"></script>
