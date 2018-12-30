@@ -10,11 +10,9 @@ const cfgParser = (code) => {
     idCounter = 0;
     endLoopNode = null;
     //root
-    let rootNode = new Node(idCounter++, 'root');
-    rootNode.shape = 'square';
+    let rootNode = new Node(idCounter++, 'root', 'square');
     //end program node
-    let endProgramNode = new Node(idCounter++, 'node');
-    endProgramNode.shape = 'square';
+    let endProgramNode = new Node(idCounter++, 'node', 'square');
     //parser
     recursiveParser(parsedScript, rootNode, endProgramNode);
     return rootNode;
@@ -44,7 +42,7 @@ function typeParser2(code, lastNode, endNode){
 
 function typeParser3(code, lastNode, endNode){
     if (code.type === 'WhileStatement') return typeWhileStatementParser(code, lastNode, endNode);
-    else if (code.type === 'IfStatement') return typeIfStatementParser(code, lastNode, endNode);
+    else if (code.type === 'IfStatement') return typeIfStatementParser(code, lastNode);
     return typeReturnStatementParser(code, lastNode, endNode);
 }
 
@@ -90,11 +88,7 @@ function typeBlockStatementParser(code, lastNode, endNode){
         //check previous for new node
         if (i > 0 && (code.body[i - 1].type === 'IfStatement' || code.body[i - 1].type === 'WhileStatement')) {
             //create new node
-            let newBlockNode = new Node(idCounter++, 'node');
-            newBlockNode.shape = 'square';
-            // endLoopNode.nextTrue = newBlockNode;
-            // newBlockNode.prevNode = endLoopNode;
-            // newBlockNode.nextTrue = endNode;
+            let newBlockNode = new Node(idCounter++, 'node', 'square');
             newBlockNode.nextTrue = endLoopNode.nextTrue;
             endLoopNode.nextTrue = newBlockNode;
             newBlockNode.prevNode = endLoopNode;
@@ -145,43 +139,29 @@ function typeLogicalExpressionParser(code) {
 
 function typeWhileStatementParser(code, lastNode, endNode){
     //new null
-    let whileNullNode = new Node(idCounter++, 'node');
-    whileNullNode.shape = 'square';
+    let whileNullNode = new Node(idCounter++, 'node', 'square');
     lastNode.nextTrue = whileNullNode;
     whileNullNode.prevNode = lastNode;
     whileNullNode.assignmentsArray.push('NULL');
 
     //new while
-    let whileNode = new Node(idCounter++, 'while');
-    whileNode.shape = 'rhombus';
+    let whileNode = new Node(idCounter++, 'while', 'rhombus');
     whileNullNode.nextTrue = whileNode;
     whileNode.prevNode = whileNullNode;
 
     //new next true
-    let nextWhileTrue = new Node(idCounter++, 'node');
-    nextWhileTrue.shape = 'square';
+    let nextWhileTrue = new Node(idCounter++, 'node', 'square');
     nextWhileTrue.condition = true;
     whileNode.nextTrue = nextWhileTrue;
     nextWhileTrue.prevNode = whileNode;
     nextWhileTrue.nextTrue = whileNullNode;
 
     //new next false
-    let nextWhileFalse = new Node(idCounter++, 'node');
-    // nextWhileFalse.isFinal = true;
-    nextWhileFalse.shape = 'square';
+    let nextWhileFalse = new Node(idCounter++, 'node', 'square');
     nextWhileFalse.condition = false;
     whileNode.nextFalse = nextWhileFalse;
     nextWhileFalse.prevNode = whileNode;
     nextWhileFalse.nextTrue = endNode;
-
-    //finals
-    // whileNullNode.finalNode = nextWhileFalse;
-    // whileNode.finalNode = nextWhileFalse;
-    // nextWhileTrue.finalNode = nextWhileFalse;
-
-    //closing while
-    // if (lastNode.type !== 'while')
-    //     lastNode.afterLoopNode = nextWhileFalse;
 
     //while itself
     whileNode.test = typeReturnValues(code.test);
@@ -189,51 +169,34 @@ function typeWhileStatementParser(code, lastNode, endNode){
     //body
     recursiveParser(code.body, nextWhileTrue, endNode);
 
-    //done
-    // whileNode.done = true;
-
     //end loop
     endLoopNode = nextWhileFalse;
 }
 
-function typeIfStatementParser(code, lastNode, endNode){
+function typeIfStatementParser(code, lastNode){
     //new if
-    let ifNode = new Node(idCounter++, 'if');
-    ifNode.shape = 'rhombus';
+    let ifNode = new Node(idCounter++, 'if', 'rhombus');
     ifNode.prevNode = lastNode;
 
     //new next true
-    let nextTrueNode = new Node(idCounter++, 'node');
-    nextTrueNode.shape = 'square';
+    let nextTrueNode = new Node(idCounter++, 'node', 'square');
     nextTrueNode.condition = true;
     ifNode.nextTrue = nextTrueNode;
     nextTrueNode.prevNode = ifNode;
 
     //new next false
-    let nextFalseNode = new Node(idCounter++, 'node');
-    nextFalseNode.shape = 'square';
+    let nextFalseNode = new Node(idCounter++, 'node', 'square');
     nextFalseNode.condition = false;
     ifNode.nextFalse = nextFalseNode;
     nextFalseNode.prevNode = ifNode;
 
     //new final
-    ifNode.finalNode = new Node(idCounter++, 'node');
-    // ifNode.finalNode.isFinal = true;
-    ifNode.finalNode.shape = 'circle';
+    ifNode.finalNode = new Node(idCounter++, 'node', 'circle');
     ifNode.finalNode.prevNode = ifNode;
     ifNode.finalNode.nextTrue = lastNode.nextTrue;
     lastNode.nextTrue = ifNode;
-    // if (lastNode.finalNode != null)
-    //     ifNode.finalNode.nextTrue = lastNode.finalNode;
-
-    //closing if
-    // if (lastNode.type !== 'if')
-    //     lastNode.afterLoopNode = ifNode.finalNode;
 
     //set finals
-    // nextTrueNode.finalNode = ifNode.finalNode;
-    // nextFalseNode.finalNode = ifNode.finalNode;
-
     nextTrueNode.nextTrue = ifNode.finalNode;
     nextFalseNode.nextTrue = ifNode.finalNode;
 
@@ -247,17 +210,13 @@ function typeIfStatementParser(code, lastNode, endNode){
     if (code.alternate != null)
         recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode);
 
-    //done
-    // ifNode.done = true;
-
     //end loop
     endLoopNode = ifNode.finalNode;
 }
 
 function typeReturnStatementParser(code, lastNode, endNode){
     //new return node
-    let returnNode = new Node(idCounter++, 'return');
-    returnNode.shape = 'square';
+    let returnNode = new Node(idCounter++, 'return', 'square');
     lastNode.nextTrue = returnNode;
     returnNode.prevNode = lastNode;
     returnNode.nextTrue = endNode;

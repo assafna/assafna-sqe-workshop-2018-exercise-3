@@ -1,8 +1,8 @@
-function Node (id, type) {
+function Node (id, type, shape) {
     this.id = id; //going up
     this.type = type; //root, node, if, while, return
     this.isFinal = false;
-    this.shape = null; //square, rhombus, circle
+    this.shape = shape; //square, rhombus, circle
     this.condition = null; //true, false
     this.test = null; //for if and while
     this.assignmentsArray = []; //for nodes
