@@ -249,12 +249,12 @@ function typeIfStatementParser2(code, lastNode, ifNode, nextTrueNode, nextFalseN
     ifNode.test = typeReturnValues(code.test, dictionary, amITrue);
     forEval = true;
     if (amITrue && safeEvalFunc(typeReturnValues(code.test, dictionary, amITrue))) nextTrueNode.isFlow = true;
-    else nextFalseNode.isFlow = true;
+    else if (amITrue) nextFalseNode.isFlow = true;
     forEval = false;
     //consequent
     recursiveParser(code.consequent, nextTrueNode, ifNode.finalNode, deepCopyDictionary(dictionary), nextTrueNode.isFlow);
     //alternate
-    if (code.alternate != null) recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode, deepCopyDictionary(dictionary), nextFalseNode.isFlow);
+    if (code.alternate != null) recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode, deepCopyDictionary(dictionary), amITrue && nextFalseNode.isFlow);
     //end loop
     endLoopNode = ifNode.finalNode;
 }

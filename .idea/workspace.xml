@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e08e9482-974e-4276-82b8-39ed2c9fc9b0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/js/cfg-objects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/cfg-objects.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/js/cfg-parser.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/cfg-parser.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/dist/" />
@@ -18,11 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/js/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="54" column="58" selection-start-line="54" selection-start-column="58" selection-end-line="54" selection-end-column="58" />
+            <state relative-caret-position="238">
+              <caret line="14" column="14" lean-forward="true" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -30,11 +28,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/js/cfg-parser.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-997">
-              <caret line="205" column="37" lean-forward="true" selection-start-line="205" selection-start-column="37" selection-end-line="205" selection-end-column="37" />
+            <state relative-caret-position="345">
+              <caret line="251" column="20" selection-start-line="251" selection-start-column="20" selection-end-line="251" selection-end-column="20" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -88,8 +86,8 @@
         <option value="$PROJECT_DIR$/src/js/my-parser.js" />
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/src/js/cfg-objects.js" />
-        <option value="$PROJECT_DIR$/src/js/cfg-parser.js" />
         <option value="$PROJECT_DIR$/src/js/app.js" />
+        <option value="$PROJECT_DIR$/src/js/cfg-parser.js" />
       </list>
     </option>
   </component>
@@ -180,12 +178,12 @@
       <option name="presentableId" value="Default" />
       <updated>1545999846059</updated>
       <workItem from="1545999849064" duration="58988000" />
-      <workItem from="1546182048776" duration="11059000" />
+      <workItem from="1546182048776" duration="11367000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70047000" />
+    <option name="totallyTimeSpent" value="70355000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="917" y="0" width="1010" height="1047" extended-state="0" />
@@ -266,22 +264,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/js/cfg-parser.js">
+    <entry file="file://$PROJECT_DIR$/src/js/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-997">
-          <caret line="205" column="37" lean-forward="true" selection-start-line="205" selection-start-column="37" selection-end-line="205" selection-end-column="37" />
+        <state relative-caret-position="238">
+          <caret line="14" column="14" lean-forward="true" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
           <folding>
-            <element signature="e#0#35#0" expanded="true" />
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/js/app.js">
+    <entry file="file://$PROJECT_DIR$/src/js/cfg-parser.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="54" column="58" selection-start-line="54" selection-start-column="58" selection-end-line="54" selection-end-column="58" />
+        <state relative-caret-position="345">
+          <caret line="251" column="20" selection-start-line="251" selection-start-column="20" selection-end-line="251" selection-end-column="20" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
