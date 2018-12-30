@@ -143,12 +143,10 @@ function typeWhileStatementParser(code, lastNode, endNode){
     lastNode.nextTrue = whileNullNode;
     whileNullNode.prevNode = lastNode;
     whileNullNode.assignmentsArray.push('NULL');
-
     //new while
     let whileNode = new Node(idCounter++, 'while', 'rhombus');
     whileNullNode.nextTrue = whileNode;
     whileNode.prevNode = whileNullNode;
-
     //new next true
     let nextWhileTrue = new Node(idCounter++, 'node', 'square');
     nextWhileTrue.condition = true;
@@ -156,6 +154,10 @@ function typeWhileStatementParser(code, lastNode, endNode){
     nextWhileTrue.prevNode = whileNode;
     nextWhileTrue.nextTrue = whileNullNode;
 
+    typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhileTrue);
+}
+
+function typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhileTrue){
     //new next false
     let nextWhileFalse = new Node(idCounter++, 'node', 'square');
     nextWhileFalse.condition = false;
@@ -190,6 +192,10 @@ function typeIfStatementParser(code, lastNode){
     ifNode.nextFalse = nextFalseNode;
     nextFalseNode.prevNode = ifNode;
 
+    typeIfStatementParser2(code, lastNode, ifNode, nextTrueNode, nextFalseNode);
+}
+
+function typeIfStatementParser2(code, lastNode, ifNode, nextTrueNode, nextFalseNode){
     //new final
     ifNode.finalNode = new Node(idCounter++, 'node', 'circle');
     ifNode.finalNode.prevNode = ifNode;
@@ -202,14 +208,10 @@ function typeIfStatementParser(code, lastNode){
 
     //if itself
     ifNode.test = typeReturnValues(code.test);
-
     //consequent
     recursiveParser(code.consequent, nextTrueNode, ifNode.finalNode);
-
     //alternate
-    if (code.alternate != null)
-        recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode);
-
+    if (code.alternate != null) recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode);
     //end loop
     endLoopNode = ifNode.finalNode;
 }
