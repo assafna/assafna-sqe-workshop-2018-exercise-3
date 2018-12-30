@@ -1,7 +1,6 @@
 function Node (id, type, shape) {
     this.id = id; //going up
     this.type = type; //root, node, if, while, return
-    this.isFinal = false;
     this.shape = shape; //square, rhombus, circle
     this.condition = null; //true, false
     this.test = null; //for if and while
@@ -9,11 +8,8 @@ function Node (id, type, shape) {
     this.nextTrue = null; //for if and while
     this.nextFalse = null; //for if and while
     this.finalNode = null;
-    this.afterLoopNode = null; //where to return after loop
     this.prevNode = null; //father node
-    this.done = false; //for ending loops
-    this.latestNode = null;
-    this.isConverted = false;
+    this.isConverted = false; //for creating graph
 
     this.toString = function () {
         return nodeTexter(this, nodeStyler(this, nodeCoder(this)));
