@@ -2,6 +2,7 @@ function Node (id, type, shape) {
     this.id = id; //going up
     this.type = type; //root, node, if, while, return
     this.shape = shape; //square, rhombus, circle
+    this.isFlow = false; //for eval and graph
     this.condition = null; //true, false
     this.test = null; //for if and while
     this.assignmentsArray = []; //for nodes

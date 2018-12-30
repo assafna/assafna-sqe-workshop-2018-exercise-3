@@ -12,9 +12,10 @@ $(document).ready(function () {
         let codeToParse = $('#codePlaceholder').val();
         let parsedCode = parseCode(codeToParse);
         $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
-
+        //args
+        let args = $('#argsPlaceholder').val();
         //cfg-parser
-        let root = cfgParser(codeToParse);
+        let root = cfgParser(codeToParse, args);
 
         //graph
         cfgArray = [];
@@ -50,6 +51,8 @@ function graphToCFGRecursive(node) {
 
 function graphToCFGRecursive2(node) {
     if (node.nextTrue == null && node.nextFalse == null && node.finalNode != null) addToCFGArray(node.id + ' --> ' + node.finalNode.toString());
+    if (node.isFlow) addToCFGArray('style ' + node.id + ' fill:lightgreen,stroke:black');
+    else addToCFGArray('style ' + node.id + ' stroke:black');
 }
 
 function addToCFGArray(text) {
