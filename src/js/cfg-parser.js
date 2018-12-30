@@ -92,9 +92,12 @@ function typeBlockStatementParser(code, lastNode, endNode){
             //create new node
             let newBlockNode = new Node(idCounter++, 'node');
             newBlockNode.shape = 'square';
+            // endLoopNode.nextTrue = newBlockNode;
+            // newBlockNode.prevNode = endLoopNode;
+            // newBlockNode.nextTrue = endNode;
+            newBlockNode.nextTrue = endLoopNode.nextTrue;
             endLoopNode.nextTrue = newBlockNode;
             newBlockNode.prevNode = endLoopNode;
-            newBlockNode.nextTrue = endNode;
             latestNode = newBlockNode;
             recursiveParser(code.body[i], latestNode, endNode);
         } else {
@@ -103,9 +106,9 @@ function typeBlockStatementParser(code, lastNode, endNode){
     }
 }
 
-function typeVariableDeclarationParser(code, lastNode, endNode){
+function typeVariableDeclarationParser(code, lastNode){
     code.declarations.forEach(function (x) {
-        typeVariableDeclaratorParser(x, lastNode, endNode);
+        typeVariableDeclaratorParser(x, lastNode);
     });
 }
 
@@ -184,7 +187,7 @@ function typeWhileStatementParser(code, lastNode, endNode){
     whileNode.test = typeReturnValues(code.test);
 
     //body
-    recursiveParser(code.body, nextWhileTrue);
+    recursiveParser(code.body, nextWhileTrue, endNode);
 
     //done
     // whileNode.done = true;
