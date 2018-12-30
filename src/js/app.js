@@ -29,7 +29,7 @@ $(document).ready(function () {
 
         // removeIrrelevantNodes(root);
         console.log(root);
-        graphToCFGRecursive(root);
+        graphToCFG(root);
         cfgArrayToString();
         console.log(root);
         console.log(cfgResult);
@@ -121,25 +121,20 @@ function printCFG(){
     mermaid.init({noteMargin: 10}, '#cfg');
 }
 
+function graphToCFG(node) {
+    addToCFGArray(node.toString());
+    graphToCFGRecursive(node);
+}
+
 function graphToCFGRecursive(node) {
-    if (id === 0) {
-        addToCFGArray(node.toString() + '\n');
-        addToCFGArray(node.id + ' --> ' + node.nextTrue.toString() + '\n');
-        id++;
-    } if (node.nextTrue != null) {
-        addToCFGArray(node.id + ' --> ' + node.nextTrue.toString() + '\n');
-        id++;
-        graphToCFGRecursive(node.nextTrue);
-    } if (node.nextFalse != null) {
-        addToCFGArray(node.id + ' --> ' + node.nextFalse.toString() + '\n');
-        id++;
-        graphToCFGRecursive(node.nextFalse);
-    } if (node.type !== 'if' && node.type !== 'while' && !node.type.includes('if2_') && node.finalNode != null) {
-        addToCFGArray(node.id + ' --> ' + node.finalNode.toString() + '\n');
-        id++;
-        if (node.type !== 'while_true')
-            graphToCFGRecursive(node.finalNode);
-    }
+    if (node == null || node.isConverted) return;
+    if (node.nextTrue != null) addToCFGArray(node.id + ' --> ' + node.nextTrue.toString());
+    if (node.nextFalse != null) addToCFGArray(node.id + ' --> ' + node.nextFalse.toString());
+    if (node.nextTrue == null && node.nextFalse == null && node.finalNode != null) addToCFGArray(node.id + ' --> ' + node.finalNode.toString());
+    node.isConverted = true;
+    graphToCFGRecursive(node.nextTrue);
+    graphToCFGRecursive(node.nextFalse);
+    graphToCFGRecursive(node.finalNode);
 }
 
 function addToCFGArray(text) {
@@ -149,5 +144,5 @@ function addToCFGArray(text) {
 
 function cfgArrayToString() {
     for (let i = 0; i < cfgArray.length; i++)
-        cfgResult += cfgArray[i];
+        cfgResult += cfgArray[i] + '\n';
 }

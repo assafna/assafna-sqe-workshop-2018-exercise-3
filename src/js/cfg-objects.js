@@ -1,13 +1,19 @@
 function Node (id, type) {
-    this.id = id;
-    this.type = type;
-    this.test = null;
-    this.assignmentsArray = [];
-    this.nextTrue = null;
-    this.nextFalse = null;
+    this.id = id; //going up
+    this.type = type; //root, node, if, while, return
+    this.isFinal = false;
+    this.shape = null; //square, rhombus, circle
+    this.condition = null; //true, false
+    this.test = null; //for if and while
+    this.assignmentsArray = []; //for nodes
+    this.nextTrue = null; //for if and while
+    this.nextFalse = null; //for if and while
     this.finalNode = null;
-    this.afterLoopNode = null;
-    this.prevNode = null;
+    this.afterLoopNode = null; //where to return after loop
+    this.prevNode = null; //father node
+    this.done = false; //for ending loops
+    this.latestNode = null;
+    this.isConverted = false;
 
     this.toString = function () {
         return nodeTexter(this, nodeStyler(this, nodeCoder(this)));
@@ -15,7 +21,7 @@ function Node (id, type) {
 }
 
 function nodeCoder(node) {
-    if (node.type === 'if' || node.type === 'while' || node.type.includes('if2_'))
+    if (node.type === 'if' || node.type === 'while')
         return node.test;
     else if (node.assignmentsArray.length > 0)
         return nodeAssignments(node);
@@ -34,18 +40,18 @@ function nodeAssignments(node) {
 }
 
 function nodeStyler(node, code) {
-    if (node.type === 'if' || node.type === 'while' || node.type.includes('if2_'))
+    if (node.shape === 'rhombus')
         return '{' + code + '}';
-    else if (node.type === 'if_final')
+    else if (node.shape === 'circle')
         return '((' + code + '))';
     else
         return '[' + code + ']';
 }
 
 function nodeTexter(node, code) {
-    if (node.type.includes('_true'))
+    if (node.condition === true)
         return '|T|' + node.id + code;
-    else if (node.type.includes('_false'))
+    else if (node.condition === false)
         return '|F|' + node.id + code;
     else
         return node.id + code;
