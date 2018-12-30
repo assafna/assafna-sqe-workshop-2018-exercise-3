@@ -5,6 +5,7 @@ import {cfgParser} from './cfg-parser';
 
 let cfgArray;
 let cfgResult;
+let removeNodesRun;
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
@@ -20,12 +21,29 @@ $(document).ready(function () {
         //graph
         cfgArray = [];
         cfgResult = 'graph TD\n';
-
+        removeNodesRun = 0;
+        removeIrrelevantNodes(root);
+        removeIrrelevantNodes(root);
         graphToCFG(root);
         cfgArrayToString();
         printCFG();
     });
 });
+
+function removeIrrelevantNodes(node){
+    if (removeNodesRun > 500) return;
+    if (node.nextFalse != null && node.nextFalse.nextTrue != null && node.nextFalse.assignmentsArray != null && node.nextFalse.assignmentsArray.length === 0 && node.nextFalse.shape === 'square') {
+        node.nextFalse.nextTrue.condition = node.nextFalse.condition;
+        node.nextFalse = node.nextFalse.nextTrue;
+    }
+    if (node.nextTrue != null && node.nextTrue.nextTrue != null && node.nextTrue.assignmentsArray != null && node.nextTrue.assignmentsArray.length === 0 && node.nextTrue.shape === 'square') {
+        node.nextTrue.nextTrue.condition = node.nextTrue.condition;
+        node.nextTrue = node.nextTrue.nextTrue;
+    }
+    removeNodesRun++;
+    if (node.nextFalse != null) removeIrrelevantNodes(node.nextFalse);
+    if (node.nextTrue != null) removeIrrelevantNodes(node.nextTrue);
+}
 
 function printCFG(){
     let div = document.getElementById('cfg');
