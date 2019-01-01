@@ -103,7 +103,7 @@ function addNumbers(){
         else if (x.includes('{')) {char = '{'; }
         if (char != null) {
             let split = x.split(char);
-            newLine = split[0] + char + '<p>' + number++ + '</p>' + split[1];
+            newLine = split[0] + char + '<small>' + number++ + '</small><br/>' + split[1];
         }
         newCFGArray.push(newLine);
     });
