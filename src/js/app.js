@@ -24,6 +24,7 @@ $(document).ready(function () {
         removeNodesRun = 0;
         removeIrrelevantNodes(root);
         graphToCFG(root);
+        addNumbers();
         cfgArrayToString();
         resetHTML();
         printCFG();
@@ -90,4 +91,21 @@ function addToCFGArray(text) {
 function cfgArrayToString() {
     for (let i = 0; i < cfgArray.length; i++)
         cfgResult += cfgArray[i] + '\n';
+}
+
+function addNumbers(){
+    let newCFGArray = [];
+    let number = 0;
+    cfgArray.forEach(function (x) {
+        let newLine = x;
+        let char = null;
+        if (x.includes('[')) { char = '['; }
+        else if (x.includes('{')) {char = '{'; }
+        if (char != null) {
+            let split = x.split(char);
+            newLine = split[0] + char + '<p>' + number++ + '</p>' + split[1];
+        }
+        newCFGArray.push(newLine);
+    });
+    cfgArray = newCFGArray;
 }
