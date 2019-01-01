@@ -176,7 +176,7 @@ function typeLogicalExpressionParser(code, dictionary, amITrue) {
 function typeWhileStatementParser(code, lastNode, endNode, dictionary, amITrue){
     //new null
     let whileNullNode = new Node(idCounter++, 'node', 'square');
-    lastNode.nextTrue = whileNullNode;
+    // lastNode.nextTrue = whileNullNode;
     whileNullNode.prevNode = lastNode;
     whileNullNode.assignmentsArray.push('NULL');
     if (amITrue) whileNullNode.isFlow = true;
@@ -192,16 +192,17 @@ function typeWhileStatementParser(code, lastNode, endNode, dictionary, amITrue){
     nextWhileTrue.prevNode = whileNode;
     nextWhileTrue.nextTrue = whileNullNode;
 
-    typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhileTrue, dictionary, amITrue);
+    typeWhileStatementParser2(code, lastNode, endNode, whileNullNode, whileNode, nextWhileTrue, dictionary, amITrue);
 }
 
-function typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhileTrue, dictionary, amITrue){
+function typeWhileStatementParser2(code, lastNode, endNode, whileNullNode, whileNode, nextWhileTrue, dictionary, amITrue){
     //new next false
     let nextWhileFalse = new Node(idCounter++, 'node', 'square');
     nextWhileFalse.condition = false;
     whileNode.nextFalse = nextWhileFalse;
     nextWhileFalse.prevNode = whileNode;
-    nextWhileFalse.nextTrue = endNode;
+    nextWhileFalse.nextTrue = lastNode.nextTrue;
+    lastNode.nextTrue = whileNullNode;
 
     //while itself
     forEval = false;
