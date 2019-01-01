@@ -25,6 +25,7 @@ $(document).ready(function () {
         removeIrrelevantNodes(root);
         graphToCFG(root);
         cfgArrayToString();
+        resetHTML();
         printCFG();
     });
 });
@@ -42,6 +43,15 @@ function removeIrrelevantNodes(node){
     removeNodesRun++;
     if (node.nextFalse != null) removeIrrelevantNodes(node.nextFalse);
     if (node.nextTrue != null) removeIrrelevantNodes(node.nextTrue);
+}
+
+function resetHTML(){
+    let td = document.getElementById('cfg_td');
+    let div = document.getElementById('cfg');
+    td.removeChild(div);
+    div = document.createElement('div');
+    div.setAttribute('id', 'cfg');
+    td.appendChild(div);
 }
 
 function printCFG(){
