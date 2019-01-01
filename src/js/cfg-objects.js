@@ -12,9 +12,9 @@ function Node (id, type, shape) {
     this.prevNode = null; //father node
     this.isConverted = false; //for creating graph
 
-    this.toString = function () {
-        return nodeTexter(this, nodeStyler(this, nodeCoder(this)));
-    };
+    this.toString = function () { return nodeTexter(this, nodeStyler(this, nodeCoder(this))); };
+    this.getLineTextOfNextTrue = function () { if (this.nextFalse != null && this.nextTrue != null) return '|T|'; else return ''; };
+    this.getLineTextOfNextFalse = function () { if (this.nextTrue != null) return '|F|'; else return ''; };
 }
 
 function nodeCoder(node) {
@@ -46,12 +46,13 @@ function nodeStyler(node, code) {
 }
 
 function nodeTexter(node, code) {
-    if (node.condition === true)
-        return '|T|' + node.id + code;
-    else if (node.condition === false)
-        return '|F|' + node.id + code;
-    else
-        return node.id + code;
+    // if (node.condition === true)
+    //     return '|T|' + node.id + code;
+    // else if (node.condition === false)
+    //     return '|F|' + node.id + code;
+    // else
+    //     return node.id + code;
+    return node.id + code;
 }
 
 export {Node};

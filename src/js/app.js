@@ -68,8 +68,8 @@ function graphToCFG(node) {
 
 function graphToCFGRecursive(node) {
     if (node == null || node.isConverted) return;
-    if (node.nextTrue != null) addToCFGArray(node.id + ' --> ' + node.nextTrue.toString());
-    if (node.nextFalse != null) addToCFGArray(node.id + ' --> ' + node.nextFalse.toString());
+    if (node.nextTrue != null) addToCFGArray(node.id + ' --> ' + node.getLineTextOfNextTrue() + node.nextTrue.toString());
+    if (node.nextFalse != null) addToCFGArray(node.id + ' --> ' + node.getLineTextOfNextFalse() + node.nextFalse.toString());
     graphToCFGRecursive2(node);
     node.isConverted = true;
     graphToCFGRecursive(node.nextTrue);
