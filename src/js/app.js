@@ -95,7 +95,7 @@ function cfgArrayToString() {
 
 function addNumbers(){
     let newCFGArray = [];
-    let number = 0;
+    let number = 1;
     cfgArray.forEach(function (x) {
         let newLine = x;
         let char = null;
