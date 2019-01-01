@@ -23,7 +23,6 @@ $(document).ready(function () {
         cfgResult = 'graph TD\n';
         removeNodesRun = 0;
         removeIrrelevantNodes(root);
-        removeIrrelevantNodes(root);
         graphToCFG(root);
         cfgArrayToString();
         printCFG();

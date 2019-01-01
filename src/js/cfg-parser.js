@@ -119,7 +119,9 @@ function typeVariableDeclarationParser(code, lastNode, dictionary, amITrue){
 function typeVariableDeclaratorParser(code, lastNode, dictionary, amITrue){
     //check if init
     if (code.init != null) {
+        forEval = false;
         lastNode.assignmentsArray.push(typeReturnValues(code.id, dictionary, amITrue) + ' = ' + typeReturnValues(code.init, dictionary, amITrue));
+        forEval = true;
         if (code.init.type === 'ArrayExpression'){
             code.init.elements.forEach(function (value, index) {
                 insertToDictionary(dictionary, code.id.name + '[' + index + ']', typeReturnValues(value, dictionary, amITrue));
@@ -128,7 +130,9 @@ function typeVariableDeclaratorParser(code, lastNode, dictionary, amITrue){
         } else
             insertToDictionary(dictionary, code.id.name, typeReturnValues(code.init, dictionary, amITrue));
     } else {
+        forEval = false;
         lastNode.assignmentsArray.push(typeReturnValues(code.id, dictionary, amITrue));
+        forEval = true;
         insertToDictionary(dictionary, code.id.name);
     }
 }
@@ -147,11 +151,14 @@ function typeExpressionStatementParser(code, lastNode, endNode, dictionary, amIT
 }
 
 function typeAssignmentExpressionParser(code, lastNode, dictionary, amITrue){
+    forEval = false;
     lastNode.assignmentsArray.push(typeReturnValues(code.left, dictionary, amITrue) + ' = ' + typeReturnValues(code.right, dictionary, amITrue));
+    forEval = true;
     insertToDictionary(dictionary, code.left.name, typeReturnValues(code.right, dictionary, amITrue));
 }
 
 function typeUpdateExpressionParser(code, lastNode, dictionary, amITrue) {
+    forEval = false;
     lastNode.assignmentsArray.push(typeReturnValues(code.argument, dictionary, amITrue) + code.operator);
     //todo handle this in dictionary
 }
@@ -197,6 +204,7 @@ function typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhile
     nextWhileFalse.nextTrue = endNode;
 
     //while itself
+    forEval = false;
     whileNode.test = typeReturnValues(code.test, dictionary, amITrue);
     forEval = true;
     if (amITrue && safeEvalFunc(typeReturnValues(code.test, dictionary, amITrue)))
@@ -205,7 +213,6 @@ function typeWhileStatementParser2(code, lastNode, endNode, whileNode, nextWhile
         amITrue = false;
         nextWhileFalse.isFlow = true;
     }
-    forEval = false;
 
     //body
     recursiveParser(code.body, nextWhileTrue, endNode, deepCopyDictionary(dictionary), amITrue);
@@ -246,6 +253,7 @@ function typeIfStatementParser2(code, lastNode, ifNode, nextTrueNode, nextFalseN
     nextTrueNode.nextTrue = ifNode.finalNode;
     nextFalseNode.nextTrue = ifNode.finalNode;
     //if itself
+    forEval = false;
     ifNode.test = typeReturnValues(code.test, dictionary, amITrue);
     forEval = true;
     if (amITrue && safeEvalFunc(typeReturnValues(code.test, dictionary, amITrue))) nextTrueNode.isFlow = true;
