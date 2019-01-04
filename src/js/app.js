@@ -17,11 +17,8 @@ $(document).ready(function () {
         let args = $('#argsPlaceholder').val();
         //cfg-parser
         let root = cfgParser(codeToParse, args);
-
         //graph
-        cfgArray = [];
-        cfgResult = 'graph TD\n';
-        removeNodesRun = 0;
+        newRun();
         removeIrrelevantNodes(root);
         graphToCFG(root);
         addNumbers();
@@ -31,19 +28,43 @@ $(document).ready(function () {
     });
 });
 
+function newRun() {
+    cfgArray = [];
+    cfgResult = 'graph TD\n';
+    removeNodesRun = 0;
+}
+
 function removeIrrelevantNodes(node){
     if (removeNodesRun > 500) return;
-    if (node.nextFalse != null && node.nextFalse.nextTrue != null && node.nextFalse.assignmentsArray != null && node.nextFalse.assignmentsArray.length === 0 && node.nextFalse.shape === 'square') {
-        node.nextFalse.nextTrue.condition = node.nextFalse.condition;
-        node.nextFalse = node.nextFalse.nextTrue;
-    }
-    if (node.nextTrue != null && node.nextTrue.nextTrue != null && node.nextTrue.assignmentsArray != null && node.nextTrue.assignmentsArray.length === 0 && node.nextTrue.shape === 'square') {
-        node.nextTrue.nextTrue.condition = node.nextTrue.condition;
-        node.nextTrue = node.nextTrue.nextTrue;
-    }
+    irrNextFalseCheckNulls(node);
+    irrNextTrueCheckNulls(node);
     removeNodesRun++;
     if (node.nextFalse != null) removeIrrelevantNodes(node.nextFalse);
     if (node.nextTrue != null) removeIrrelevantNodes(node.nextTrue);
+}
+
+function irrNextFalse(node){
+    if (node.nextFalse.assignmentsArray.length === 0 && node.nextFalse.shape === 'square') {
+        node.nextFalse.nextTrue.condition = node.nextFalse.condition;
+        node.nextFalse = node.nextFalse.nextTrue;
+    }
+}
+
+function irrNextFalseCheckNulls(node){
+    if (node.nextFalse != null && node.nextFalse.nextTrue != null && node.nextFalse.assignmentsArray != null)
+        irrNextFalse(node);
+}
+
+function irrNextTrue(node){
+    if (node.nextTrue.assignmentsArray.length === 0 && node.nextTrue.shape === 'square') {
+        node.nextTrue.nextTrue.condition = node.nextTrue.condition;
+        node.nextTrue = node.nextTrue.nextTrue;
+    }
+}
+
+function irrNextTrueCheckNulls(node){
+    if (node.nextTrue != null && node.nextTrue.nextTrue != null && node.nextTrue.assignmentsArray != null)
+        irrNextTrue(node);
 }
 
 function resetHTML(){

@@ -78,17 +78,9 @@ function typeProgramParser(code, lastNode, endNode, dictionary, amITrue){
 }
 
 function typeFunctionDeclarationParser(code, lastNode, endNode, dictionary, amITrue){
-    //add params
-    // functionParamsParser(code.params, dictionary);
     //body
     recursiveParser(code.body, lastNode, endNode, deepCopyDictionary(dictionary), amITrue);
 }
-
-// function functionParamsParser(code, dictionary){
-//     code.forEach(function (x) {
-//         insertToDictionary(dictionary, x.name, x.name);
-//     });
-// }
 
 function typeBlockStatementParser(code, lastNode, endNode, dictionary, amITrue){
     let latestNode = lastNode;
@@ -98,7 +90,7 @@ function typeBlockStatementParser(code, lastNode, endNode, dictionary, amITrue){
         if (i > 0 && (code.body[i - 1].type === 'IfStatement' || code.body[i - 1].type === 'WhileStatement')) {
             //create new node
             let newBlockNode = new Node(idCounter++, 'node', 'square');
-            if (amITrue) newBlockNode.isFlow = true;
+            newBlockFlowContinue(newBlockNode, amITrue);
             newBlockNode.nextTrue = endLoopNode.nextTrue;
             endLoopNode.nextTrue = newBlockNode;
             newBlockNode.prevNode = endLoopNode;
@@ -108,6 +100,10 @@ function typeBlockStatementParser(code, lastNode, endNode, dictionary, amITrue){
             recursiveParser(code.body[i], latestNode, endNode, dictionary, amITrue);
         }
     }
+}
+
+function newBlockFlowContinue(newBlockNode, amITrue) {
+    if (amITrue) newBlockNode.isFlow = true;
 }
 
 function typeVariableDeclarationParser(code, lastNode, dictionary, amITrue){
@@ -160,7 +156,6 @@ function typeAssignmentExpressionParser(code, lastNode, dictionary, amITrue){
 function typeUpdateExpressionParser(code, lastNode, dictionary, amITrue) {
     forEval = false;
     lastNode.assignmentsArray.push(typeReturnValues(code.argument, dictionary, amITrue) + code.operator);
-    //todo handle this in dictionary
 }
 
 function typeBinaryExpressionParser(code, dictionary, amITrue){
@@ -191,7 +186,6 @@ function typeWhileStatementParser(code, lastNode, endNode, dictionary, amITrue){
     whileNode.nextTrue = nextWhileTrue;
     nextWhileTrue.prevNode = whileNode;
     nextWhileTrue.nextTrue = whileNullNode;
-
     typeWhileStatementParser2(code, lastNode, endNode, whileNullNode, whileNode, nextWhileTrue, dictionary, amITrue);
 }
 
@@ -203,7 +197,6 @@ function typeWhileStatementParser2(code, lastNode, endNode, whileNullNode, while
     nextWhileFalse.prevNode = whileNode;
     nextWhileFalse.nextTrue = lastNode.nextTrue;
     lastNode.nextTrue = whileNullNode;
-
     //while itself
     forEval = false;
     whileNode.test = typeReturnValues(code.test, dictionary, amITrue);
@@ -212,14 +205,9 @@ function typeWhileStatementParser2(code, lastNode, endNode, whileNullNode, while
         nextWhileTrue.isFlow = true;
     else {
         amITrue = false;
-        nextWhileFalse.isFlow = true;
-    }
-
-    //body
-    recursiveParser(code.body, nextWhileTrue, endNode, deepCopyDictionary(dictionary), amITrue);
-
-    //end loop
-    endLoopNode = nextWhileFalse;
+        nextWhileFalse.isFlow = true; }
+    recursiveParser(code.body, nextWhileTrue, endNode, deepCopyDictionary(dictionary), amITrue); //body
+    endLoopNode = nextWhileFalse; //end loop
 }
 
 function typeIfStatementParser(code, lastNode, dictionary, amITrue){
@@ -248,24 +236,28 @@ function typeIfStatementParser2(code, lastNode, ifNode, nextTrueNode, nextFalseN
     ifNode.finalNode = new Node(idCounter++, 'node', 'circle');
     ifNode.finalNode.prevNode = ifNode;
     ifNode.finalNode.nextTrue = lastNode.nextTrue;
-    if (amITrue) ifNode.finalNode.isFlow = true;
+    ifNodeFinalNodeFlow(ifNode, amITrue);
     lastNode.nextTrue = ifNode;
-    //set finals
-    nextTrueNode.nextTrue = ifNode.finalNode;
-    nextFalseNode.nextTrue = ifNode.finalNode;
+    nextTrueNode.nextTrue = ifNode.finalNode; //final
+    nextFalseNode.nextTrue = ifNode.finalNode; //final
     //if itself
     forEval = false;
     ifNode.test = typeReturnValues(code.test, dictionary, amITrue);
     forEval = true;
     if (amITrue && safeEvalFunc(typeReturnValues(code.test, dictionary, amITrue))) nextTrueNode.isFlow = true;
-    else if (amITrue) nextFalseNode.isFlow = true;
+    else nextFalseFlow(nextFalseNode, amITrue);
     forEval = false;
-    //consequent
-    recursiveParser(code.consequent, nextTrueNode, ifNode.finalNode, deepCopyDictionary(dictionary), nextTrueNode.isFlow);
-    //alternate
-    if (code.alternate != null) recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode, deepCopyDictionary(dictionary), amITrue && nextFalseNode.isFlow);
-    //end loop
-    endLoopNode = ifNode.finalNode;
+    recursiveParser(code.consequent, nextTrueNode, ifNode.finalNode, deepCopyDictionary(dictionary), nextTrueNode.isFlow); //consequent
+    if (code.alternate != null) recursiveParser(code.alternate, nextFalseNode, ifNode.finalNode, deepCopyDictionary(dictionary), amITrue && nextFalseNode.isFlow); //alternate
+    endLoopNode = ifNode.finalNode; //end loop
+}
+
+function ifNodeFinalNodeFlow(ifNode, amITrue) {
+    if (amITrue) ifNode.finalNode.isFlow = true;
+}
+
+function nextFalseFlow(nextFalseNode, amITrue){
+    if (amITrue) nextFalseNode.isFlow = true;
 }
 
 function typeReturnStatementParser(code, lastNode, endNode, dictionary, amITrue){
