@@ -38,11 +38,11 @@ function nodeAssignments(node) {
 
 function nodeStyler(node, code) {
     if (node.shape === 'rhombus')
-        return '{' + code + '}';
+        return '{"' + code + '"}';
     else if (node.shape === 'circle')
-        return '((' + code + '))';
+        return '(("' + code + '"))';
     else
-        return '[' + code + ']';
+        return '["' + code + '"]';
 }
 
 function nodeTexter(node, code) {

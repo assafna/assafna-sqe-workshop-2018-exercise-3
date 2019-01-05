@@ -2,6 +2,7 @@ import $ from 'jquery';
 import mermaid from 'mermaid';
 import {parseCode} from './code-analyzer';
 import {cfgParser} from './cfg-parser';
+import {Node} from './cfg-objects';
 
 let cfgArray;
 let cfgResult;
@@ -9,6 +10,8 @@ let removeNodesRun;
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
+        let node = new Node(0, 'node', 'circle');
+        console.log(JSON.stringify(node.toString()));
         //code-analyzer
         let codeToParse = $('#codePlaceholder').val();
         let parsedCode = parseCode(codeToParse);
@@ -17,10 +20,11 @@ $(document).ready(function () {
         let args = $('#argsPlaceholder').val();
         //cfg-parser
         let root = cfgParser(codeToParse, args);
+        console.log(JSON.stringify(root[1]));
         //graph
         newRun();
-        removeIrrelevantNodes(root);
-        graphToCFG(root);
+        removeIrrelevantNodes(root[0]);
+        graphToCFG(root[0]);
         addNumbers();
         cfgArrayToString();
         resetHTML();
@@ -120,8 +124,8 @@ function addNumbers(){
     cfgArray.forEach(function (x) {
         let newLine = x;
         let char = null;
-        if (x.includes('[')) { char = '['; }
-        else if (x.includes('{')) {char = '{'; }
+        if (x.includes('["')) { char = '["'; }
+        else if (x.includes('{"')) {char = '{"'; }
         if (char != null) {
             let split = x.split(char);
             newLine = split[0] + char + '<small>' + number++ + '</small><br/>' + split[1];

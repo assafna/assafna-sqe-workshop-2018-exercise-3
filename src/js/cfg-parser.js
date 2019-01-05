@@ -5,13 +5,18 @@ let idCounter;
 let endLoopNode;
 let dictionary;
 let forEval;
+let allNodes;
+let safeStop;
 
 const cfgParser = (code, args) => {
+    if (code == null || args == null || code === '' || args === '') return null;
     let parsedScript = esprima.parseScript(code);
     //new
     idCounter = 0;
     endLoopNode = null;
     dictionary = {};
+    allNodes = {};
+    safeStop = 0;
     argsParser(args);
     forEval = false;
     //root
@@ -22,12 +27,28 @@ const cfgParser = (code, args) => {
     endProgramNode.isFlow = true;
     //parser
     recursiveParser(parsedScript, rootNode, endProgramNode, dictionary, true);
-    return rootNode;
+    rootToAllNodes(rootNode);
+    return [rootNode, allNodes];
 };
 
+function rootToAllNodes(x){
+    if (x == null || safeStop > 500) return;
+    let nextTrue = null;
+    let nextFalse = null;
+    if (x.nextTrue != null) nextTrue = x.nextTrue.id;
+    if (x.nextFalse != null) nextFalse = x.nextFalse.id;
+    let nodeToObject = { 'id': x.id, 'type': x.type, 'shape': x.shape, 'isFlow': x.isFlow, 'test': x.test, 'assignmentArray': x.assignmentsArray, 'nextTrue': nextTrue, 'nextFalse': nextFalse };
+    addToAllNodes(x, nodeToObject);
+}
+
+function addToAllNodes(x, nodeToObject){
+    allNodes[x.id] = nodeToObject;
+    rootToAllNodes(x.nextTrue);
+    rootToAllNodes(x.nextFalse);
+    safeStop++;
+}
+
 function recursiveParser(code, lastNode, endNode, dictionary, amITrue){
-    //stop condition
-    if (code == null || code.type == null) return;
     typeParser1(code, lastNode, endNode, dictionary, amITrue);
 }
 
@@ -57,6 +78,7 @@ function typeReturnValues(code, dictionary, amITrue){
     if (code.type === 'MemberExpression') return typeMemberExpressionParser(code, dictionary, amITrue);
     else if (code.type === 'BinaryExpression') return typeBinaryExpressionParser(code, dictionary, amITrue);
     else if (code.type === 'LogicalExpression') return typeLogicalExpressionParser(code, dictionary, amITrue);
+    else if (code.type === 'ArrayExpression') return typeArrayExpressionParser(code, dictionary, amITrue);
     else return typeReturnValues2(code, dictionary, amITrue);
 }
 
@@ -115,8 +137,6 @@ function typeVariableDeclarationParser(code, lastNode, dictionary, amITrue){
 function typeVariableDeclaratorParser(code, lastNode, dictionary, amITrue){
     //check if init
     if (code.init != null) {
-        forEval = false;
-        lastNode.assignmentsArray.push(typeReturnValues(code.id, dictionary, amITrue) + ' = ' + typeReturnValues(code.init, dictionary, amITrue));
         forEval = true;
         if (code.init.type === 'ArrayExpression'){
             code.init.elements.forEach(function (value, index) {
@@ -125,12 +145,22 @@ function typeVariableDeclaratorParser(code, lastNode, dictionary, amITrue){
             insertToDictionary(dictionary, code.id.name, typeArrayExpressionToStringArray(code.init.elements, dictionary, amITrue));
         } else
             insertToDictionary(dictionary, code.id.name, typeReturnValues(code.init, dictionary, amITrue));
+        forEval = false;
+        lastNode.assignmentsArray.push(typeReturnValues(code.id, dictionary, amITrue) + ' = ' + typeReturnValues(code.init, dictionary, amITrue));
     } else {
         forEval = false;
         lastNode.assignmentsArray.push(typeReturnValues(code.id, dictionary, amITrue));
         forEval = true;
         insertToDictionary(dictionary, code.id.name);
     }
+}
+
+function typeArrayExpressionParser(code, dictionary, amITrue) {
+    let result = '[';
+    code.elements.forEach(function (value) {
+        result += typeReturnValues(value, dictionary, amITrue) + ',';
+    });
+    return result.substring(0, result.length - 1) + ']';
 }
 
 function typeArrayExpressionToStringArray(code, dictionary, amITrue){
