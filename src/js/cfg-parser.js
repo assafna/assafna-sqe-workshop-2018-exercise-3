@@ -19,10 +19,8 @@ const cfgParser = (code, args) => {
     safeStop = 0;
     argsParser(args);
     forEval = false;
-    //root
     let rootNode = new Node(idCounter++, 'root', 'square');
     rootNode.isFlow = true;
-    //end program node
     let endProgramNode = new Node(idCounter++, 'node', 'square');
     endProgramNode.isFlow = true;
     //parser

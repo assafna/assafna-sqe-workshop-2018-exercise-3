@@ -2,7 +2,6 @@ import $ from 'jquery';
 import mermaid from 'mermaid';
 import {parseCode} from './code-analyzer';
 import {cfgParser} from './cfg-parser';
-import {Node} from './cfg-objects';
 
 let cfgArray;
 let cfgResult;
@@ -10,8 +9,6 @@ let removeNodesRun;
 
 $(document).ready(function () {
     $('#codeSubmissionButton').click(() => {
-        let node = new Node(0, 'node', 'circle');
-        console.log(JSON.stringify(node.toString()));
         //code-analyzer
         let codeToParse = $('#codePlaceholder').val();
         let parsedCode = parseCode(codeToParse);
@@ -20,7 +17,6 @@ $(document).ready(function () {
         let args = $('#argsPlaceholder').val();
         //cfg-parser
         let root = cfgParser(codeToParse, args);
-        console.log(JSON.stringify(root[1]));
         //graph
         newRun();
         removeIrrelevantNodes(root[0]);
