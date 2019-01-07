@@ -41,9 +41,9 @@ function rootToAllNodes(x){
 
 function addToAllNodes(x, nodeToObject){
     allNodes[x.id] = nodeToObject;
+    safeStop++;
     rootToAllNodes(x.nextTrue);
     rootToAllNodes(x.nextFalse);
-    safeStop++;
 }
 
 function recursiveParser(code, lastNode, endNode, dictionary, amITrue){
@@ -297,6 +297,7 @@ function typeReturnStatementParser(code, lastNode, endNode, dictionary, amITrue)
     if (amITrue) returnNode.isFlow = true;
 
     //empty
+    forEval = false;
     if (code.argument == null)
         returnNode.assignmentsArray.push('return');
     else
